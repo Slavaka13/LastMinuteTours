@@ -13,16 +13,21 @@ namespace LastMinuteTours.Forms
         {
             InitializeComponent();
 
+            // Если передали тур — клонируем; если нет — создаём новый
             targetTour = sourceTour?.Clone() ?? new TourModel();
 
             Text = sourceTour is null ? "Добавление тура" : "Редактирование тура";
             buttonSave.Text = sourceTour is null ? "Добавить" : "Сохранить";
 
-            // UI init
+            // Настройка ComboBox
             comboBoxDirection.DropDownStyle = ComboBoxStyle.DropDownList;
             comboBoxDirection.DataSource = Enum.GetValues(typeof(Direction));
 
-            // биндинги + ErrorProvider + реактивная кнопка
+            // Если создаём новый тур — оставляем пустой выбор
+            if (sourceTour is null)
+                comboBoxDirection.SelectedIndex = -1;
+
+            // Привязки с поддержкой ErrorProvider и автообновлением кнопки
             comboBoxDirection.AddBinding(x => x.SelectedItem, targetTour, x => x.Direction, errorProvider1, UpdateSaveButtonState);
             dateTimePickerDepartureDate.AddBinding(x => x.Value, targetTour, x => x.DepartureDate, errorProvider1, UpdateSaveButtonState);
             numericUpDownNumberNights.AddBinding(x => x.Value, targetTour, x => x.NumberNights, errorProvider1, UpdateSaveButtonState);
@@ -36,15 +41,14 @@ namespace LastMinuteTours.Forms
 
         private void buttonSave_Click(object sender, EventArgs e)
         {
+            // Запуск валидации всех контролов
             ValidateChildren(ValidationConstraints.Enabled);
 
-            if (!targetTour.IsValid() || targetTour.Direction == Direction.Unknown)
+            // Проверка модели
+            if (!targetTour.IsValid())
             {
-                if (targetTour.Direction == Direction.Unknown)
-                    errorProvider1.SetError(comboBoxDirection, "Выберите направление тура");
-
-                MessageBox.Show("Исправьте ошибки в форме перед сохранением.", "Ошибка валидации",
-                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Исправьте ошибки в форме перед сохранением.",
+                    "Ошибка валидации", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
@@ -58,15 +62,10 @@ namespace LastMinuteTours.Forms
             Close();
         }
 
+        /// <summary>Активирует кнопку, если все поля валидны.</summary>
         private void UpdateSaveButtonState()
         {
-            var isValid = targetTour.IsValid() && targetTour.Direction != Direction.Unknown;
-            buttonSave.Enabled = isValid;
-
-            if (targetTour.Direction == Direction.Unknown)
-                errorProvider1.SetError(comboBoxDirection, "Выберите направление тура");
-            else
-                errorProvider1.SetError(comboBoxDirection, string.Empty);
+            buttonSave.Enabled = targetTour.IsValid();
         }
 
         /// <summary>Текущее состояние редактируемого тура.</summary>
