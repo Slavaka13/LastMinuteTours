@@ -1,59 +1,48 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using static System.Runtime.InteropServices.JavaScript.JSType;
+using LastMinuteTours.Models.Validation;
 
 namespace LastMinuteTours.Models
 {
-    /// <summary>
-    /// Домённая модель туристической поездки (тура).
-    /// </summary>
+    /// <summary>Домённая модель туристической поездки (тура).</summary>
     public class TourModel
     {
-        /// <summary>
-        /// Уникальный идентификатор тура.
-        /// </summary>
-        public Guid Id { get; set; }
+        public Guid Id { get; set; } = Guid.NewGuid();
 
-        /// <inheritdoc cref="Models.Direction"/>
-        [Required(ErrorMessage = "Выберите направление тура")]
-        public Direction Direction { get; set; }
+        /// <summary>Направление тура.</summary>
+        [Range(1, int.MaxValue, ErrorMessage = "Выберите направление тура")]
+        public Direction Direction { get; set; } = Direction.Unknown;
 
-        /// <summary>
-        /// Дата отправления (вылета/выезда).
-        /// </summary>
-        public DateOnly DepartureDate { get; set; }
+        /// <summary>Дата отправления (вылета/выезда).</summary>
+        [DataType(DataType.Date)]
+        public DateTime DepartureDate { get; set; } = DateTime.Today;
 
-        /// <summary>
-        /// Количество ночей проживания.
-        /// </summary>
-        [Range(1, 30, ErrorMessage = "Кол-во ночей должно быть от 1 до 30")]
-        public int NumberNights { get; set; }
+        /// <summary>Количество ночей проживания.</summary>
+        [Range(TourValidation.MinNights, TourValidation.MaxNights,
+            ErrorMessage = "Кол-во ночей должно быть от {1} до {2}")]
+        public int NumberNights { get; set; } = 1;
 
-        /// <summary>
-        /// Стоимость на одного отдыхающего, руб.
-        /// </summary>
-        [Range(0.01, 100000, ErrorMessage = "Стоимость должна быть в диапазоне от 0 до 100000")]
-        public decimal CostPerVacationer { get; set; }
+        /// <summary>Стоимость на одного отдыхающего, руб.</summary>
+        [Range(typeof(decimal), TourValidation.MinCostPerVacationerStr, TourValidation.MaxCostPerVacationerStr,
+            ErrorMessage = "Стоимость должна быть от {1} до {2}")]
+        public decimal CostPerVacationer { get; set; } = 0.00m;
 
-        /// <summary>
-        /// Число отдыхающих.
-        /// </summary>
-        [Range(1, 10, ErrorMessage = "Кол-во отдыхающих должно быть от 1 до 10")]
-        public int NumberVacationers { get; set; }
+        /// <summary>Число отдыхающих.</summary>
+        [Range(TourValidation.MinVacationers, TourValidation.MaxVacationers,
+            ErrorMessage = "Кол-во отдыхающих должно быть от {1} до {2}")]
+        public int NumberVacationers { get; set; } = 1;
 
-        /// <summary>
-        /// Наличие Wi-Fi в туре/размещении.
-        /// </summary>
-        public bool AvailabilityWiFi { get; set; }
+        /// <summary>Наличие Wi-Fi.</summary>
+        public bool AvailabilityWiFi { get; set; } = false;
 
-        /// <summary>
-        /// Сумма доплат, руб. (топливные сборы, страховки и пр.).
-        /// </summary>
-        [Range(0.00, 100000, ErrorMessage = "Доплаты должны быть в диапазоне от 0 до 100000")]
-        public decimal Surcharges { get; set; }
+        /// <summary>Сумма доплат, руб.</summary>
+        [Range(typeof(decimal), TourValidation.MinSurchargesStr, TourValidation.MaxSurchargesStr,
+            ErrorMessage = "Доплаты должны быть от {1} до {2}")]
+        public decimal Surcharges { get; set; } = 0.00m;
 
-        /// <summary>
-        /// Итоговая стоимость тура: (цена за человека × количество) + доплаты.
-        /// </summary>
+        /// <summary>Итоговая стоимость тура</summary>
         public decimal TotalCost => (CostPerVacationer * NumberVacationers) + Surcharges;
+
+        /// <summary>Поверхностный клон (осторожно с ссылочными полями).</summary>
+        public TourModel Clone() => (TourModel)this.MemberwiseClone();
     }
 }

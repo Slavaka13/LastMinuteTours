@@ -1,6 +1,7 @@
-﻿using LastMinuteTours.Forms;
-using LastMinuteTours.Models;
+﻿using System.Globalization;
 using System.Windows.Forms;
+using LastMinuteTours.Forms;
+using LastMinuteTours.Models;
 
 namespace LastMinuteTours
 {
@@ -9,30 +10,29 @@ namespace LastMinuteTours
     /// </summary>
     public partial class MainForm : Form
     {
-        /// <summary>
-        /// Коллекция туров, выступающая источником данных для таблицы.
-        /// </summary>
-        private readonly List<TourModel> items;
+        /// <summary>Коллекция туров, выступающая источником данных для таблицы.</summary>
+        private readonly List<TourModel> items = new();
 
-        /// <summary>
-        /// Промежуточный источник данных для связки коллекции с DataGridView.
-        /// </summary>
+        /// <summary>Промежуточный источник данных для связки коллекции с DataGridView.</summary>
         private readonly BindingSource bindingSource = new();
 
-        /// <summary>
-        /// Создаёт главную форму, инициализирует тестовые данные и настраивает привязки.
-        /// </summary>
         public MainForm()
         {
-            // Подготовка коллекции
-            items = new List<TourModel>();
+            InitializeComponent();
 
-            // Примеры туров (демо-данные)
+            // Таблица описана в дизайнере — автогенерацию колонок отключаем.
+            dataGridViewTours.AutoGenerateColumns = false;
+
+            // Если есть колонка даты с DataPropertyName = "DepartureDate" — зададим формат отображения.
+            if (dataGridViewTours.Columns.Contains("DepartureDate"))
+                dataGridViewTours.Columns["DepartureDate"].DefaultCellStyle.Format = "dd.MM.yyyy";
+
+            // Демо-данные
+            var fmt = "dd.MM.yyyy";
             items.Add(new TourModel
             {
-                Id = Guid.NewGuid(),
-                Direction = Models.Direction.Turkey,
-                DepartureDate = DateOnly.Parse("11.11.2025"),
+                Direction = Direction.Turkey,
+                DepartureDate = DateTime.ParseExact("11.11.2025", fmt, CultureInfo.InvariantCulture),
                 NumberNights = 1,
                 CostPerVacationer = 34000.00m,
                 NumberVacationers = 1,
@@ -42,9 +42,8 @@ namespace LastMinuteTours
 
             items.Add(new TourModel
             {
-                Id = Guid.NewGuid(),
-                Direction = Models.Direction.Spain,
-                DepartureDate = DateOnly.Parse("11.10.2025"),
+                Direction = Direction.Spain,
+                DepartureDate = DateTime.ParseExact("11.10.2025", fmt, CultureInfo.InvariantCulture),
                 NumberNights = 5,
                 CostPerVacationer = 96000.00m,
                 NumberVacationers = 2,
@@ -54,9 +53,8 @@ namespace LastMinuteTours
 
             items.Add(new TourModel
             {
-                Id = Guid.NewGuid(),
-                Direction = Models.Direction.Italy,
-                DepartureDate = DateOnly.Parse("10.11.2025"),
+                Direction = Direction.Italy,
+                DepartureDate = DateTime.ParseExact("10.11.2025", fmt, CultureInfo.InvariantCulture),
                 NumberNights = 3,
                 CostPerVacationer = 57000.00m,
                 NumberVacationers = 3,
@@ -66,9 +64,8 @@ namespace LastMinuteTours
 
             items.Add(new TourModel
             {
-                Id = Guid.NewGuid(),
-                Direction = Models.Direction.France,
-                DepartureDate = DateOnly.Parse("12.11.2025"),
+                Direction = Direction.France,
+                DepartureDate = DateTime.ParseExact("12.11.2025", fmt, CultureInfo.InvariantCulture),
                 NumberNights = 4,
                 CostPerVacationer = 51000.00m,
                 NumberVacationers = 4,
@@ -78,81 +75,104 @@ namespace LastMinuteTours
 
             items.Add(new TourModel
             {
-                Id = Guid.NewGuid(),
-                Direction = Models.Direction.Shushary,
-                DepartureDate = DateOnly.Parse("13.05.2025"),
+                Direction = Direction.Shushary,
+                DepartureDate = DateTime.ParseExact("13.05.2025", fmt, CultureInfo.InvariantCulture),
                 NumberNights = 12,
                 CostPerVacationer = 100.00m,
-                NumberVacationers = 0,
+                NumberVacationers = 1,
                 AvailabilityWiFi = true,
                 Surcharges = 500.00m,
             });
 
-            InitializeComponent();
+            // Привязка источника
+            bindingSource.DataSource = items;
+            dataGridViewTours.DataSource = bindingSource;
 
-            dataGridViewTours.AutoGenerateColumns = false; // Колонки описаны в дизайнере, автогенерацию отключаем.
-
-            bindingSource.DataSource = items;    // Источник привязки — наша коллекция
-            dataGridViewTours.DataSource = bindingSource; // Привязываем таблицу к BindingSource
-
-            SetStatistics(); // Рассчитать и отобразить сводные показатели
+            RefreshGridAndStats();
         }
 
-        /// <summary>
-        /// Кастомное форматирование ячеек таблицы (читаемые подписи для enum и bool).
-        /// </summary>
+        /// <summary>Кастомное форматирование ячеек таблицы (читаемые подписи для enum и bool).</summary>
         private void dataGridViewTours_CellFormatting(object sender, DataGridViewCellFormattingEventArgs e)
         {
-            // Игнорируем заголовки и невалидные индексы
-            if (e.RowIndex < 0 || e.ColumnIndex < 0)
-                return;
+            if (e.RowIndex < 0 || e.ColumnIndex < 0) return;
 
-            // Ссылки на текущие колонку и строку
             var col = dataGridViewTours.Columns[e.ColumnIndex];
             var row = dataGridViewTours.Rows[e.RowIndex];
+            if (row.DataBoundItem is not TourModel tour) return;
 
-            // Если строка не привязана к объекту — форматировать нечего
-            if (row.DataBoundItem == null)
-                return;
-
-            var tour = (TourModel)dataGridViewTours.Rows[e.RowIndex].DataBoundItem; // Объект тура текущей строки
-
-            // Для Direction выводим локализованное название вместо значения enum
             if (col.DataPropertyName == nameof(TourModel.Direction))
             {
-                switch (tour.Direction)
+                e.Value = tour.Direction switch
                 {
-                    case Direction.Turkey:
-                        e.Value = "Турция";
-                        break;
-                    case Direction.Spain:
-                        e.Value = "Испания";
-                        break;
-                    case Direction.Italy:
-                        e.Value = "Италия";
-                        break;
-                    case Direction.France:
-                        e.Value = "Франция";
-                        break;
-                    case Direction.Shushary:
-                        e.Value = "Шушары";
-                        break;
-                    default:
-                        e.Value = string.Empty;
-                        break;
-                }
+                    Direction.Turkey => "Турция",
+                    Direction.Spain => "Испания",
+                    Direction.Italy => "Италия",
+                    Direction.France => "Франция",
+                    Direction.Shushary => "Шушары",
+                    _ => string.Empty
+                };
             }
 
-            // Для AvailabilityWiFi показываем "Да"/"Нет" вместо true/false
             if (col.DataPropertyName == nameof(TourModel.AvailabilityWiFi))
-            {
                 e.Value = tour.AvailabilityWiFi ? "Да" : "Нет";
+        }
+
+        /// <summary>Добавление нового тура (кнопка «Добавить»).</summary>
+        private void tlStrpBtnAdd_Click(object sender, EventArgs e)
+        {
+            using var addForm = new TourForm();
+            if (addForm.ShowDialog(this) == DialogResult.OK)
+            {
+                items.Add(addForm.CurrentTour);
+                RefreshGridAndStats();
             }
         }
 
-        /// <summary>
-        /// Пересчитывает и показывает сводную статистику по всем турам.
-        /// </summary>
+        /// <summary>Редактирование выбранного тура (кнопка «Редактировать»).</summary>
+        private void tlStrpBtnEdit_Click(object sender, EventArgs e)
+        {
+            if (dataGridViewTours.SelectedRows.Count == 0) return;
+
+            var tour = (TourModel)dataGridViewTours.SelectedRows[0].DataBoundItem!;
+            using var editForm = new TourForm(tour);
+
+            if (editForm.ShowDialog(this) == DialogResult.OK)
+            {
+                var updated = editForm.CurrentTour;
+                var selectedTour = items.FirstOrDefault(x => x.Id == updated.Id);
+                if (selectedTour != null)
+                {
+                    selectedTour.Direction = updated.Direction;
+                    selectedTour.DepartureDate = updated.DepartureDate;
+                    selectedTour.NumberNights = updated.NumberNights;
+                    selectedTour.CostPerVacationer = updated.CostPerVacationer;
+                    selectedTour.NumberVacationers = updated.NumberVacationers;
+                    selectedTour.AvailabilityWiFi = updated.AvailabilityWiFi;
+                    selectedTour.Surcharges = updated.Surcharges;
+
+                    RefreshGridAndStats();
+                }
+            }
+        }
+
+        /// <summary>Удаление выбранного тура (кнопка «Удалить») с подтверждением.</summary>
+        private void tlStrpBtnDelete_Click(object sender, EventArgs e)
+        {
+            if (dataGridViewTours.SelectedRows.Count == 0) return;
+
+            var tour = (TourModel)dataGridViewTours.SelectedRows[0].DataBoundItem!;
+            var selectedTour = items.FirstOrDefault(x => x.Id == tour.Id);
+
+            if (selectedTour != null &&
+                MessageBox.Show($"Удалить тур '{tour.Direction}'?",
+                    "Удаление тура", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+            {
+                items.Remove(selectedTour);
+                RefreshGridAndStats();
+            }
+        }
+
+        /// <summary>Пересчитывает и показывает сводную статистику по всем турам.</summary>
         private void SetStatistics()
         {
             toolStrpLblTotalTours.Text = $"Общее кол-во туров: {items.Count}";
@@ -161,90 +181,11 @@ namespace LastMinuteTours
             toolStrpLblTotalSurcharges.Text = $"Общая сумма доплат: {items.Sum(t => t.Surcharges)}";
         }
 
-        /// <summary>
-        /// Добавление нового тура (кнопка «Добавить»): открытие формы, сохранение и обновление списка/статистики.
-        /// </summary>
-        private void tlStrpBtnAdd_Click(object sender, EventArgs e)
+        /// <summary>Единая точка обновления таблицы и статистики.</summary>
+        private void RefreshGridAndStats()
         {
-            var addForm = new TourForm(); // Форма в режиме добавления
-
-            if (addForm.ShowDialog(this) == DialogResult.OK)
-            {
-                items.Add(addForm.CurrentTour);        // Сохраняем новый тур
-                bindingSource.ResetBindings(false);    // Обновляем таблицу
-                SetStatistics();                       // Обновляем сводные данные
-            }
-        }
-
-        /// <summary>
-        /// Редактирование выбранного тура (кнопка «Редактировать»).
-        /// </summary>
-        private void tlStrpBtnEdit_Click(object sender, EventArgs e)
-        {
-            // Нечего редактировать, если ничего не выделено
-            if (dataGridViewTours.SelectedRows.Count == 0)
-            {
-                return;
-            }
-
-            var tour = (TourModel)dataGridViewTours.SelectedRows[0].DataBoundItem; // Выбранный тур
-            var editForm = new TourForm(tour); 
-
-            if (editForm.ShowDialog(this) == DialogResult.OK)
-            {
-                // Находим исходный объект в коллекции и переносим изменения
-                var selectedTour = items.FirstOrDefault(x => x.Id == editForm.CurrentTour.Id);
-                if (selectedTour != null)
-                {
-                    selectedTour.Direction = editForm.CurrentTour.Direction;
-                    selectedTour.DepartureDate = editForm.CurrentTour.DepartureDate;
-                    selectedTour.NumberNights = editForm.CurrentTour.NumberNights;
-                    selectedTour.CostPerVacationer = editForm.CurrentTour.CostPerVacationer;
-                    selectedTour.NumberVacationers = editForm.CurrentTour.NumberVacationers;
-                    selectedTour.AvailabilityWiFi = editForm.CurrentTour.AvailabilityWiFi;
-                    selectedTour.Surcharges = editForm.CurrentTour.Surcharges;
-
-                    bindingSource.ResetBindings(false); 
-                    SetStatistics();                 
-                }
-            }
-        }
-
-        /// <summary>
-        /// Удаление выбранного тура (кнопка «Удалить») с подтверждением.
-        /// </summary>
-        private void tlStrpBtnDelete_Click(object sender, EventArgs e)
-        {
-            
-            if (dataGridViewTours.SelectedRows.Count == 0)
-            {
-                return;
-            }
-
-            var tour = (TourModel)dataGridViewTours.SelectedRows[0].DataBoundItem; // Выбранный тур
-            var selectedTour = items.FirstOrDefault(x => x.Id == tour.Id);        // Поиск в коллекции
-
-            // Если нашли и пользователь подтвердил — удаляем
-            if (selectedTour != null &&
-                MessageBox.Show($"Удалить тур '{tour.Direction}'?",
-                "Удаление тура",
-                MessageBoxButtons.YesNo,
-                MessageBoxIcon.Question) == DialogResult.Yes)
-            {
-                items.Remove(selectedTour);
-                bindingSource.ResetBindings(false); 
-                SetStatistics();                    
-            }
-        }
-
-        private void dataGridViewTours_CellContentClick(object sender, DataGridViewCellEventArgs e)
-        {
-
-        }
-
-        private void MainForm_Load(object sender, EventArgs e)
-        {
-
+            bindingSource.ResetBindings(false);
+            SetStatistics();
         }
     }
 }

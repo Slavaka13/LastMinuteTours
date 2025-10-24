@@ -2,15 +2,8 @@
 {
     partial class MainForm
     {
-        /// <summary>
-        ///  Required designer variable.
-        /// </summary>
         private System.ComponentModel.IContainer components = null;
 
-        /// <summary>
-        ///  Clean up any resources being used.
-        /// </summary>
-        /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
         protected override void Dispose(bool disposing)
         {
             if (disposing && (components != null))
@@ -22,10 +15,6 @@
 
         #region Windows Form Designer generated code
 
-        /// <summary>
-        ///  Required method for Designer support - do not modify
-        ///  the contents of this method with the code editor.
-        /// </summary>
         private void InitializeComponent()
         {
             dataGridViewTours = new DataGridView();
@@ -56,18 +45,21 @@
             dataGridViewTours.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
             dataGridViewTours.BackgroundColor = Color.SteelBlue;
             dataGridViewTours.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dataGridViewTours.Columns.AddRange(new DataGridViewColumn[] { DGDirection, DGDepartureDate, DGNumberNights, DGCostPerVacationer, DGNumberVacationers, DGAvailabilityWiFi, DGSurcharges, DGTotalCost });
+            dataGridViewTours.Columns.AddRange(new DataGridViewColumn[] {
+                DGDirection, DGDepartureDate, DGNumberNights, DGCostPerVacationer,
+                DGNumberVacationers, DGAvailabilityWiFi, DGSurcharges, DGTotalCost
+            });
             dataGridViewTours.Location = new Point(0, 28);
             dataGridViewTours.Name = "dataGridViewTours";
             dataGridViewTours.Size = new Size(1224, 397);
             dataGridViewTours.TabIndex = 0;
-            dataGridViewTours.CellContentClick += dataGridViewTours_CellContentClick;
+            // привязка только к форматированию — обработчик есть в MainForm.cs
             dataGridViewTours.CellFormatting += dataGridViewTours_CellFormatting;
             // 
             // DGDirection
             // 
             DGDirection.DataPropertyName = "Direction";
-            DGDirection.HeaderText = "Направление ";
+            DGDirection.HeaderText = "Направление";
             DGDirection.Name = "DGDirection";
             // 
             // DGDepartureDate
@@ -75,6 +67,8 @@
             DGDepartureDate.DataPropertyName = "DepartureDate";
             DGDepartureDate.HeaderText = "Дата вылета";
             DGDepartureDate.Name = "DGDepartureDate";
+            // формат даты сразу на колонке
+            DGDepartureDate.DefaultCellStyle.Format = "dd.MM.yyyy";
             // 
             // DGNumberNights
             // 
@@ -115,7 +109,10 @@
             // statusStripRegistry
             // 
             statusStripRegistry.BackColor = Color.SteelBlue;
-            statusStripRegistry.Items.AddRange(new ToolStripItem[] { toolStrpLblTotalTours, toolStrpLblTotalCost, toolStrpLblToursWithSurcharges, toolStrpLblTotalSurcharges });
+            statusStripRegistry.Items.AddRange(new ToolStripItem[] {
+                toolStrpLblTotalTours, toolStrpLblTotalCost,
+                toolStrpLblToursWithSurcharges, toolStrpLblTotalSurcharges
+            });
             statusStripRegistry.Location = new Point(0, 425);
             statusStripRegistry.Name = "statusStripRegistry";
             statusStripRegistry.Size = new Size(1224, 25);
@@ -135,8 +132,8 @@
             toolStrpLblTotalCost.Font = new Font("Segoe UI", 11.25F);
             toolStrpLblTotalCost.ForeColor = Color.White;
             toolStrpLblTotalCost.Name = "toolStrpLblTotalCost";
-            toolStrpLblTotalCost.Size = new Size(198, 20);
-            toolStrpLblTotalCost.Text = "Общая сумма за вссе туры:";
+            toolStrpLblTotalCost.Size = new Size(196, 20);
+            toolStrpLblTotalCost.Text = "Общая сумма за все туры:";
             // 
             // toolStrpLblToursWithSurcharges
             // 
@@ -171,7 +168,7 @@
             tlStrpBtnAdd.ImageTransparentColor = Color.Magenta;
             tlStrpBtnAdd.Name = "tlStrpBtnAdd";
             tlStrpBtnAdd.Size = new Size(23, 22);
-            tlStrpBtnAdd.Text = "Добавить ";
+            tlStrpBtnAdd.Text = "Добавить";
             tlStrpBtnAdd.Click += tlStrpBtnAdd_Click;
             // 
             // tlStrpBtnEdit
@@ -208,7 +205,7 @@
             Name = "MainForm";
             StartPosition = FormStartPosition.CenterScreen;
             Text = "Общая статистика";
-            Load += MainForm_Load;
+            // убрали подписку на MainForm_Load (метода нет)
             ((System.ComponentModel.ISupportInitialize)dataGridViewTours).EndInit();
             statusStripRegistry.ResumeLayout(false);
             statusStripRegistry.PerformLayout();

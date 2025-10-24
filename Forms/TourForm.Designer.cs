@@ -2,30 +2,17 @@
 {
     partial class TourForm
     {
-        /// <summary>
-        /// Required designer variable.
-        /// </summary>
         private System.ComponentModel.IContainer components = null;
 
-        /// <summary>
-        /// Clean up any resources being used.
-        /// </summary>
-        /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
         protected override void Dispose(bool disposing)
         {
             if (disposing && (components != null))
-            {
                 components.Dispose();
-            }
             base.Dispose(disposing);
         }
 
         #region Windows Form Designer generated code
 
-        /// <summary>
-        /// Required method for Designer support - do not modify
-        /// the contents of this method with the code editor.
-        /// </summary>
         private void InitializeComponent()
         {
             components = new System.ComponentModel.Container();
@@ -67,8 +54,7 @@
             textBoxCostPerVacationer.Location = new Point(206, 236);
             textBoxCostPerVacationer.Name = "textBoxCostPerVacationer";
             textBoxCostPerVacationer.Size = new Size(213, 27);
-            textBoxCostPerVacationer.TabIndex = 1;
-            textBoxCostPerVacationer.Validating += textBoxCostPerVacationer_Validating;
+            textBoxCostPerVacationer.TabIndex = 3;
             // 
             // comboBoxDirection
             // 
@@ -77,8 +63,8 @@
             comboBoxDirection.Location = new Point(206, 59);
             comboBoxDirection.Name = "comboBoxDirection";
             comboBoxDirection.Size = new Size(213, 28);
-            comboBoxDirection.TabIndex = 2;
-            comboBoxDirection.Validating += comboBoxDirection_Validating;
+            comboBoxDirection.TabIndex = 1;
+            comboBoxDirection.DropDownStyle = ComboBoxStyle.DropDownList;
             // 
             // labelDepartureDate
             // 
@@ -139,10 +125,11 @@
             // 
             numericUpDownNumberVacationers.Font = new Font("Segoe UI", 11.25F, FontStyle.Regular, GraphicsUnit.Point, 204);
             numericUpDownNumberVacationers.Location = new Point(206, 304);
+            numericUpDownNumberVacationers.Minimum = 1;
+            numericUpDownNumberVacationers.Maximum = 10;
             numericUpDownNumberVacationers.Name = "numericUpDownNumberVacationers";
             numericUpDownNumberVacationers.Size = new Size(213, 27);
-            numericUpDownNumberVacationers.TabIndex = 9;
-            numericUpDownNumberVacationers.Validating += numericUpDownNumberVacationers_Validating;
+            numericUpDownNumberVacationers.TabIndex = 5;
             // 
             // textBoxSurcharges
             // 
@@ -150,17 +137,17 @@
             textBoxSurcharges.Location = new Point(206, 356);
             textBoxSurcharges.Name = "textBoxSurcharges";
             textBoxSurcharges.Size = new Size(213, 27);
-            textBoxSurcharges.TabIndex = 10;
-            textBoxSurcharges.Validating += textBoxSurcharges_Validating;
+            textBoxSurcharges.TabIndex = 6;
             // 
             // numericUpDownNumberNights
             // 
             numericUpDownNumberNights.Font = new Font("Segoe UI", 11.25F, FontStyle.Regular, GraphicsUnit.Point, 204);
             numericUpDownNumberNights.Location = new Point(206, 169);
+            numericUpDownNumberNights.Minimum = 1;
+            numericUpDownNumberNights.Maximum = 30;
             numericUpDownNumberNights.Name = "numericUpDownNumberNights";
             numericUpDownNumberNights.Size = new Size(213, 27);
-            numericUpDownNumberNights.TabIndex = 11;
-            numericUpDownNumberNights.Validating += numericUpDownNumberNights_Validating;
+            numericUpDownNumberNights.TabIndex = 4;
             // 
             // dateTimePickerDepartureDate
             // 
@@ -169,8 +156,9 @@
             dateTimePickerDepartureDate.Location = new Point(206, 120);
             dateTimePickerDepartureDate.Name = "dateTimePickerDepartureDate";
             dateTimePickerDepartureDate.Size = new Size(213, 27);
-            dateTimePickerDepartureDate.TabIndex = 12;
-            dateTimePickerDepartureDate.Validating += dateTimePickerDepartureDate_Validating;
+            dateTimePickerDepartureDate.TabIndex = 2;
+            dateTimePickerDepartureDate.Format = DateTimePickerFormat.Custom;
+            dateTimePickerDepartureDate.CustomFormat = "dd.MM.yyyy";
             // 
             // checkBoxAvailabilityWiFiYes
             // 
@@ -180,7 +168,7 @@
             checkBoxAvailabilityWiFiYes.Location = new Point(206, 405);
             checkBoxAvailabilityWiFiYes.Name = "checkBoxAvailabilityWiFiYes";
             checkBoxAvailabilityWiFiYes.Size = new Size(100, 25);
-            checkBoxAvailabilityWiFiYes.TabIndex = 13;
+            checkBoxAvailabilityWiFiYes.TabIndex = 7;
             checkBoxAvailabilityWiFiYes.Text = "Есть Wi-Fi";
             checkBoxAvailabilityWiFiYes.UseVisualStyleBackColor = true;
             // 
@@ -190,7 +178,7 @@
             buttonSave.Location = new Point(206, 460);
             buttonSave.Name = "buttonSave";
             buttonSave.Size = new Size(213, 32);
-            buttonSave.TabIndex = 14;
+            buttonSave.TabIndex = 8;
             buttonSave.Text = "Добавить";
             buttonSave.UseVisualStyleBackColor = true;
             buttonSave.Click += buttonSave_Click;
@@ -201,7 +189,7 @@
             buttonCancel.Location = new Point(576, 12);
             buttonCancel.Name = "buttonCancel";
             buttonCancel.Size = new Size(117, 32);
-            buttonCancel.TabIndex = 15;
+            buttonCancel.TabIndex = 9;
             buttonCancel.Text = "Отмена";
             buttonCancel.UseVisualStyleBackColor = true;
             buttonCancel.Click += buttonCancel_Click;
@@ -236,7 +224,6 @@
             Name = "TourForm";
             StartPosition = FormStartPosition.CenterScreen;
             Text = "Редактор тура";
-            Load += TourForm_Load;
             ((System.ComponentModel.ISupportInitialize)numericUpDownNumberVacationers).EndInit();
             ((System.ComponentModel.ISupportInitialize)numericUpDownNumberNights).EndInit();
             ((System.ComponentModel.ISupportInitialize)errorProvider1).EndInit();
