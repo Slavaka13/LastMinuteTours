@@ -39,8 +39,7 @@ namespace LastMinuteTours.Models
             ErrorMessage = "Доплаты должны быть от {1} до {2}")]
         public decimal Surcharges { get; set; } = 0.00m;
 
-        /// <summary>Итоговая стоимость тура</summary>
-        public decimal TotalCost => (CostPerVacationer * NumberVacationers) + Surcharges;
+       
 
         /// <summary>Поверхностный клон (осторожно с ссылочными полями).</summary>
         public TourModel Clone() => (TourModel)this.MemberwiseClone();

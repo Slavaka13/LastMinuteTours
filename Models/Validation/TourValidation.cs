@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace LastMinuteTours.Models.Validation
 {
-    public static class TourValidation
+    public class TourValidation
     {
         // Ночи
         public const int MinNights = 1;

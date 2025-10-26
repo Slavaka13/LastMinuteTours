@@ -94,29 +94,42 @@ namespace LastMinuteTours
         /// <summary>Кастомное форматирование ячеек таблицы (читаемые подписи для enum и bool).</summary>
         private void dataGridViewTours_CellFormatting(object sender, DataGridViewCellFormattingEventArgs e)
         {
-            if (e.RowIndex < 0 || e.ColumnIndex < 0) return;
+            if (e.RowIndex < 0 || e.ColumnIndex < 0)
+                return;
 
             var col = dataGridViewTours.Columns[e.ColumnIndex];
             var row = dataGridViewTours.Rows[e.RowIndex];
-            if (row.DataBoundItem is not TourModel tour) return;
 
+            if (row.DataBoundItem == null)
+                return;
+
+            var tour = (TourModel)row.DataBoundItem;
+
+            // Названия стран вместо enum
             if (col.DataPropertyName == nameof(TourModel.Direction))
             {
-                e.Value = tour.Direction switch
+                switch (tour.Direction)
                 {
-                    Direction.Turkey => "Турция",
-                    Direction.Spain => "Испания",
-                    Direction.Italy => "Италия",
-                    Direction.France => "Франция",
-                    Direction.Shushary => "Шушары",
-                    _ => string.Empty
-                };
+                    case Direction.Turkey: e.Value = "Турция"; break;
+                    case Direction.Spain: e.Value = "Испания"; break;
+                    case Direction.Italy: e.Value = "Италия"; break;
+                    case Direction.France: e.Value = "Франция"; break;
+                    case Direction.Shushary: e.Value = "Шушары"; break;
+                }
             }
 
+            // Для AvailabilityWiFi показываем "Да"/"Нет"
             if (col.DataPropertyName == nameof(TourModel.AvailabilityWiFi))
+            {
                 e.Value = tour.AvailabilityWiFi ? "Да" : "Нет";
-        }
+            }
 
+            // Для столбца "TotalCost" вычисляем на лету
+            if (col.DataPropertyName == "TotalCost")
+            {
+                e.Value = (tour.CostPerVacationer * tour.NumberVacationers + tour.Surcharges).ToString("N2");
+            }
+        }
         /// <summary>Добавление нового тура (кнопка «Добавить»).</summary>
         private void tlStrpBtnAdd_Click(object sender, EventArgs e)
         {
@@ -175,11 +188,14 @@ namespace LastMinuteTours
         /// <summary>Пересчитывает и показывает сводную статистику по всем турам.</summary>
         private void SetStatistics()
         {
+            decimal totalCost = items.Sum(t => t.CostPerVacationer * t.NumberVacationers + t.Surcharges);
+
             toolStrpLblTotalTours.Text = $"Общее кол-во туров: {items.Count}";
-            toolStrpLblTotalCost.Text = $"Общая сумма за все туры: {items.Sum(t => t.TotalCost)} руб.";
+            toolStrpLblTotalCost.Text = $"Общая сумма за все туры: {totalCost:N2} руб.";
             toolStrpLblToursWithSurcharges.Text = $"Кол-во туров с доплатами: {items.Count(t => t.Surcharges > 0)}";
-            toolStrpLblTotalSurcharges.Text = $"Общая сумма доплат: {items.Sum(t => t.Surcharges)}";
+            toolStrpLblTotalSurcharges.Text = $"Общая сумма доплат: {items.Sum(t => t.Surcharges):N2}";
         }
+
 
         /// <summary>Единая точка обновления таблицы и статистики.</summary>
         private void RefreshGridAndStats()

@@ -33,6 +33,6 @@
         /// <summary>
         /// Шушары
         /// </summary>
-        Shushary
+        Shushary,
     }
 }
