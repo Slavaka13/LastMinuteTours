@@ -13,11 +13,13 @@
     <Version>1.0.1</Version>
   </PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\LastMinuteTours.Entities\LastMinuteTours.Entities.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\LastMinuteTours.Entities\LastMinuteTours.Entities.csproj" />
+		<ProjectReference Include="..\LastMinuteTours.Services.Contracts\LastMinuteTours.Services.Contracts.csproj" />
+		
+	</ItemGroup>
 
-  <ItemGroup>
+	<ItemGroup>
     <None Update="photo_2025-07-25_12-03-17.jpg">
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
