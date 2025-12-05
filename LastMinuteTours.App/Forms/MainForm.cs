@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using LastMinuteTours.Entities;
 using LastMinuteTours.Services;
@@ -21,7 +24,7 @@ namespace LastMinuteTours.App
         {
             InitializeComponent();
 
-            this.tourService = tourService;
+            this.tourService = tourService ?? throw new ArgumentNullException(nameof(tourService));
 
             // Колонки задаём вручную, поэтому авто-генерацию отключаем
             dataGridViewTours.AutoGenerateColumns = false;
@@ -30,11 +33,43 @@ namespace LastMinuteTours.App
             if (dataGridViewTours.Columns.Contains("DGDepartureDate"))
                 dataGridViewTours.Columns["DGDepartureDate"].DefaultCellStyle.Format = "dd.MM.yyyy";
 
-            // Привязка списка туров к гриду
-            bindingSource.DataSource = tourService.GetAllTours();
+            // Пока источник данных — пустой список
+            bindingSource.DataSource = new List<TourModel>();
             dataGridViewTours.DataSource = bindingSource;
 
-            RefreshGridAndStats();
+            // При загрузке формы подгружаем данные асинхронно
+            this.Load += MainForm_Load;
+        }
+
+        /// <summary>
+        /// Асинхронная загрузка туров и статистики при старте формы.
+        /// </summary>
+        private async void MainForm_Load(object? sender, EventArgs e)
+        {
+            try
+            {
+                await LoadToursAndStatsAsync();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(this,
+                    "Ошибка при загрузке туров: " + ex.Message,
+                    "Ошибка",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
+            }
+        }
+
+        /// <summary>
+        /// Общий метод: подгрузить туры и пересчитать статистику.
+        /// </summary>
+        private async Task LoadToursAndStatsAsync()
+        {
+            var tours = await tourService.GetAllToursAsync(CancellationToken.None);
+            bindingSource.DataSource = tours;
+            bindingSource.ResetBindings(false);
+
+            await SetStatisticsAsync();
         }
 
         /// <summary>
@@ -83,19 +118,30 @@ namespace LastMinuteTours.App
         }
 
         /// <summary>Добавить новый тур.</summary>
-        private void tlStrpBtnAdd_Click(object sender, EventArgs e)
+        private async void tlStrpBtnAdd_Click(object sender, EventArgs e)
         {
             using var form = new TourForm();
 
             if (form.ShowDialog(this) == DialogResult.OK)
             {
-                tourService.AddTour(form.CurrentTour);
-                RefreshGridAndStats();
+                try
+                {
+                    await tourService.AddTourAsync(form.CurrentTour, CancellationToken.None);
+                    await LoadToursAndStatsAsync();
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(this,
+                        "Ошибка при добавлении тура: " + ex.Message,
+                        "Ошибка",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Error);
+                }
             }
         }
 
         /// <summary>Отредактировать выделенный тур.</summary>
-        private void tlStrpBtnEdit_Click(object sender, EventArgs e)
+        private async void tlStrpBtnEdit_Click(object sender, EventArgs e)
         {
             if (dataGridViewTours.SelectedRows.Count == 0)
                 return;
@@ -106,13 +152,24 @@ namespace LastMinuteTours.App
 
             if (form.ShowDialog(this) == DialogResult.OK)
             {
-                tourService.UpdateTour(form.CurrentTour);
-                RefreshGridAndStats();
+                try
+                {
+                    await tourService.UpdateTourAsync(form.CurrentTour, CancellationToken.None);
+                    await LoadToursAndStatsAsync();
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(this,
+                        "Ошибка при обновлении тура: " + ex.Message,
+                        "Ошибка",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Error);
+                }
             }
         }
 
         /// <summary>Удалить выделенный тур.</summary>
-        private void tlStrpBtnDelete_Click(object sender, EventArgs e)
+        private async void tlStrpBtnDelete_Click(object sender, EventArgs e)
         {
             if (dataGridViewTours.SelectedRows.Count == 0)
                 return;
@@ -123,34 +180,45 @@ namespace LastMinuteTours.App
                     $"Удалить тур '{tour.Direction}'?",
                     "Удаление",
                     MessageBoxButtons.YesNo,
-                    MessageBoxIcon.Question) == DialogResult.Yes)
+                    MessageBoxIcon.Question) != DialogResult.Yes)
             {
-                tourService.DeleteTour(tour.Id);
-                RefreshGridAndStats();
+                return;
+            }
+
+            try
+            {
+                await tourService.DeleteTourAsync(tour.Id, CancellationToken.None);
+                await LoadToursAndStatsAsync();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(this,
+                    "Ошибка при удалении тура: " + ex.Message,
+                    "Ошибка",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
             }
         }
 
         /// <summary>Пересчёт статистики в статус-баре.</summary>
-        private void SetStatistics()
+        private async Task SetStatisticsAsync()
         {
+            var totalTours = await tourService.GetTotalToursAsync(CancellationToken.None);
+            var totalCost = await tourService.GetTotalCostAsync(CancellationToken.None);
+            var toursWithSurcharges = await tourService.GetToursWithSurchargesAsync(CancellationToken.None);
+            var totalSurcharges = await tourService.GetTotalSurchargesAsync(CancellationToken.None);
+
             toolStrpLblTotalTours.Text =
-                "Общее кол-во туров: " + tourService.GetTotalTours();
+                "Общее кол-во туров: " + totalTours;
 
             toolStrpLblTotalCost.Text =
-                $"Общая сумма за все туры: {tourService.GetTotalCost():N2} руб.";
+                $"Общая сумма за все туры: {totalCost:N2} руб.";
 
             toolStrpLblToursWithSurcharges.Text =
-                "Кол-во туров с доплатами: " + tourService.GetToursWithSurcharges();
+                "Кол-во туров с доплатами: " + toursWithSurcharges;
 
             toolStrpLblTotalSurcharges.Text =
-                $"Общая сумма доплат: {tourService.GetTotalSurcharges():N2} руб.";
-        }
-
-        /// <summary>Обновить грид и статистику.</summary>
-        private void RefreshGridAndStats()
-        {
-            bindingSource.ResetBindings(false);
-            SetStatistics();
+                $"Общая сумма доплат: {totalSurcharges:N2} руб.";
         }
     }
 }
