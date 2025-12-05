@@ -10,7 +10,7 @@
     <PackageTags>Duksin</PackageTags>
     <PackageIcon>photo_2025-07-25_12-03-17.jpg</PackageIcon>
     <PackageReadmeFile>README.md</PackageReadmeFile>
-    <Version>1.0.1</Version>
+    <Version>1.1.0</Version>
   </PropertyGroup>
 
 	<ItemGroup>
