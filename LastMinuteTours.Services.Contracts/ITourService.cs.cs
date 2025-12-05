@@ -19,15 +19,11 @@ namespace LastMinuteTours.Services
         /// Метод должен возвращать копию набора данных, чтобы внешние изменения
         /// не могли повлиять на состояние хранилища.
         /// </summary>
-        /// <param name="token">Токен отмены операции.</param>
-        /// <returns>Список всех туров.</returns>
         Task<IList<TourModel>> GetAllToursAsync(CancellationToken token);
 
         /// <summary>
         /// Добавляет новый тур в хранилище.
         /// </summary>
-        /// <param name="tour">Экземпляр тура, который необходимо добавить.</param>
-        /// <param name="token">Токен отмены операции.</param>
         Task AddTourAsync(TourModel tour, CancellationToken token);
 
         /// <summary>
@@ -35,16 +31,12 @@ namespace LastMinuteTours.Services
         /// Если тур с указанным идентификатором не найден, реализация может 
         /// либо проигнорировать обновление, либо выбросить исключение.
         /// </summary>
-        /// <param name="tour">Обновлённый экземпляр туров.</param>
-        /// <param name="token">Токен отмены операции.</param>
         Task UpdateTourAsync(TourModel tour, CancellationToken token);
 
         /// <summary>
         /// Удаляет тур с указанным идентификатором.
         /// Если тур отсутствует — операция должна быть безопасной и не приводить к ошибкам.
         /// </summary>
-        /// <param name="id">Идентификатор тура, который необходимо удалить.</param>
-        /// <param name="token">Токен отмены операции.</param>
         Task DeleteTourAsync(Guid id, CancellationToken token);
 
         /// <summary>
@@ -52,8 +44,6 @@ namespace LastMinuteTours.Services
         /// Статистика включает общее количество туров, их суммарную стоимость,
         /// количество туров с доплатами и общий объём доплат.
         /// </summary>
-        /// <param name="token">Токен отмены операции.</param>
-        /// <returns>Объект <see cref="TourStatistics"/> со всеми вычисленными значениями.</returns>
         Task<TourStatistics> GetStatisticsAsync(CancellationToken token);
     }
 }
