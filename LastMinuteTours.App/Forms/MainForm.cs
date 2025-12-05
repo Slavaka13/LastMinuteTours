@@ -203,22 +203,19 @@ namespace LastMinuteTours.App
         /// <summary>Пересчёт статистики в статус-баре.</summary>
         private async Task SetStatisticsAsync()
         {
-            var totalTours = await tourService.GetTotalToursAsync(CancellationToken.None);
-            var totalCost = await tourService.GetTotalCostAsync(CancellationToken.None);
-            var toursWithSurcharges = await tourService.GetToursWithSurchargesAsync(CancellationToken.None);
-            var totalSurcharges = await tourService.GetTotalSurchargesAsync(CancellationToken.None);
+            var stats = await tourService.GetStatisticsAsync(CancellationToken.None);
 
             toolStrpLblTotalTours.Text =
-                "Общее кол-во туров: " + totalTours;
+                "Общее кол-во туров: " + stats.TotalTours;
 
             toolStrpLblTotalCost.Text =
-                $"Общая сумма за все туры: {totalCost:N2} руб.";
+                $"Общая сумма за все туры: {stats.TotalCost:N2} руб.";
 
             toolStrpLblToursWithSurcharges.Text =
-                "Кол-во туров с доплатами: " + toursWithSurcharges;
+                "Кол-во туров с доплатами: " + stats.ToursWithSurcharges;
 
             toolStrpLblTotalSurcharges.Text =
-                $"Общая сумма доплат: {totalSurcharges:N2} руб.";
+                $"Общая сумма доплат: {stats.TotalSurcharges:N2} руб.";
         }
     }
 }

@@ -16,7 +16,6 @@
 	<ItemGroup>
 		<ProjectReference Include="..\LastMinuteTours.Entities\LastMinuteTours.Entities.csproj" />
 		<ProjectReference Include="..\LastMinuteTours.Services.Contracts\LastMinuteTours.Services.Contracts.csproj" />
-		
 	</ItemGroup>
 
 	<ItemGroup>

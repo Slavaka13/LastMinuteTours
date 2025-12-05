@@ -4,76 +4,110 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using LastMinuteTours.Entities;
-using LastMinuteTours.Services;
+using LastMinuteTours.Services.Contracts;
 
 namespace LastMinuteTours.Services
 {
+    /// <summary>
+    /// Простая реализация ITourService в памяти процесса.
+    /// Подходит для тестов, примеров и демонстраций.
+    /// </summary>
     public class InMemoryStorage : ITourService
     {
         private readonly List<TourModel> tours = new();
+        private readonly object syncRoot = new();
 
+        /// <inheritdoc />
         public Task<IList<TourModel>> GetAllToursAsync(CancellationToken token)
         {
-            return Task.FromResult<IList<TourModel>>(tours);
+            token.ThrowIfCancellationRequested();
+
+            IList<TourModel> snapshot;
+            lock (syncRoot)
+            {
+                // создаём копию, чтобы внешние изменения не ломали коллекцию
+                snapshot = tours.ToList();
+            }
+
+            return Task.FromResult(snapshot);
         }
 
+        /// <inheritdoc />
         public Task AddTourAsync(TourModel tour, CancellationToken token)
         {
+            token.ThrowIfCancellationRequested();
+
             if (tour == null)
                 throw new ArgumentNullException(nameof(tour));
 
-            tours.Add(tour);
-            return Task.CompletedTask;
-        }
-
-        public Task UpdateTourAsync(TourModel tour, CancellationToken token)
-        {
-            if (tour == null)
-                throw new ArgumentNullException(nameof(tour));
-
-            var existing = tours.FirstOrDefault(t => t.Id == tour.Id);
-            if (existing != null)
+            lock (syncRoot)
             {
-                existing.Direction = tour.Direction;
-                existing.DepartureDate = tour.DepartureDate;
-                existing.NumberNights = tour.NumberNights;
-                existing.CostPerVacationer = tour.CostPerVacationer;
-                existing.NumberVacationers = tour.NumberVacationers;
-                existing.AvailabilityWiFi = tour.AvailabilityWiFi;
-                existing.Surcharges = tour.Surcharges;
+                tours.Add(tour);
             }
 
             return Task.CompletedTask;
         }
 
-        public Task DeleteTourAsync(Guid id, CancellationToken token)
+        /// <inheritdoc />
+        public Task UpdateTourAsync(TourModel tour, CancellationToken token)
         {
-            var existing = tours.FirstOrDefault(t => t.Id == id);
-            if (existing != null)
-                tours.Remove(existing);
+            token.ThrowIfCancellationRequested();
+
+            if (tour == null)
+                throw new ArgumentNullException(nameof(tour));
+
+            lock (syncRoot)
+            {
+                var existing = tours.FirstOrDefault(t => t.Id == tour.Id);
+                if (existing != null)
+                {
+                    existing.Direction = tour.Direction;
+                    existing.DepartureDate = tour.DepartureDate;
+                    existing.NumberNights = tour.NumberNights;
+                    existing.CostPerVacationer = tour.CostPerVacationer;
+                    existing.NumberVacationers = tour.NumberVacationers;
+                    existing.AvailabilityWiFi = tour.AvailabilityWiFi;
+                    existing.Surcharges = tour.Surcharges;
+                }
+            }
 
             return Task.CompletedTask;
         }
 
-        public Task<int> GetTotalToursAsync(CancellationToken token)
+        /// <inheritdoc />
+        public Task DeleteTourAsync(Guid id, CancellationToken token)
         {
-            return Task.FromResult(tours.Count);
+            token.ThrowIfCancellationRequested();
+
+            lock (syncRoot)
+            {
+                var existing = tours.FirstOrDefault(t => t.Id == id);
+                if (existing != null)
+                    tours.Remove(existing);
+            }
+
+            return Task.CompletedTask;
         }
 
-        public Task<decimal> GetTotalCostAsync(CancellationToken token)
+        /// <inheritdoc />
+        public Task<TourStatistics> GetStatisticsAsync(CancellationToken token)
         {
-            decimal sum = tours.Sum(t => t.CostPerVacationer * t.NumberVacationers + t.Surcharges);
-            return Task.FromResult(sum);
-        }
+            token.ThrowIfCancellationRequested();
 
-        public Task<int> GetToursWithSurchargesAsync(CancellationToken token)
-        {
-            return Task.FromResult(tours.Count(t => t.Surcharges > 0));
-        }
+            TourStatistics stats;
 
-        public Task<decimal> GetTotalSurchargesAsync(CancellationToken token)
-        {
-            return Task.FromResult(tours.Sum(t => t.Surcharges));
+            lock (syncRoot)
+            {
+                stats = new TourStatistics
+                {
+                    TotalTours = tours.Count,
+                    TotalCost = tours.Sum(t => t.CostPerVacationer * t.NumberVacationers + t.Surcharges),
+                    ToursWithSurcharges = tours.Count(t => t.Surcharges > 0),
+                    TotalSurcharges = tours.Sum(t => t.Surcharges)
+                };
+            }
+
+            return Task.FromResult(stats);
         }
     }
 }
