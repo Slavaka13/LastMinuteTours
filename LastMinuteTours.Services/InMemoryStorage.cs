@@ -20,23 +20,15 @@ namespace LastMinuteTours.Services
         /// <inheritdoc />
         public Task<IList<TourModel>> GetAllToursAsync(CancellationToken token)
         {
-            token.ThrowIfCancellationRequested();
-
-            IList<TourModel> snapshot;
             lock (syncRoot)
             {
-                // создаём копию, чтобы внешние изменения не ломали коллекцию
-                snapshot = tours.ToList();
+                return Task.FromResult<IList<TourModel>>(tours.ToList());
             }
-
-            return Task.FromResult(snapshot);
         }
 
         /// <inheritdoc />
         public Task AddTourAsync(TourModel tour, CancellationToken token)
         {
-            token.ThrowIfCancellationRequested();
-
             if (tour == null)
                 throw new ArgumentNullException(nameof(tour));
 
@@ -51,14 +43,13 @@ namespace LastMinuteTours.Services
         /// <inheritdoc />
         public Task UpdateTourAsync(TourModel tour, CancellationToken token)
         {
-            token.ThrowIfCancellationRequested();
-
             if (tour == null)
                 throw new ArgumentNullException(nameof(tour));
 
             lock (syncRoot)
             {
                 var existing = tours.FirstOrDefault(t => t.Id == tour.Id);
+
                 if (existing != null)
                 {
                     existing.Direction = tour.Direction;
@@ -77,8 +68,6 @@ namespace LastMinuteTours.Services
         /// <inheritdoc />
         public Task DeleteTourAsync(Guid id, CancellationToken token)
         {
-            token.ThrowIfCancellationRequested();
-
             lock (syncRoot)
             {
                 var existing = tours.FirstOrDefault(t => t.Id == id);
@@ -92,8 +81,6 @@ namespace LastMinuteTours.Services
         /// <inheritdoc />
         public Task<TourStatistics> GetStatisticsAsync(CancellationToken token)
         {
-            token.ThrowIfCancellationRequested();
-
             TourStatistics stats;
 
             lock (syncRoot)
