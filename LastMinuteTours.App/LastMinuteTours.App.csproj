@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<OutputType>WinExe</OutputType>
+		<TargetFramework>net8.0-windows</TargetFramework>
+		<Nullable>enable</Nullable>
+		<UseWindowsForms>true</UseWindowsForms>
+		<ImplicitUsings>enable</ImplicitUsings>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<Folder Include="Resources\" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\LastMinuteTours.Entities\LastMinuteTours.Entities.csproj" />
+		<ProjectReference Include="..\LastMinuteTours.Services.Contracts\LastMinuteTours.Services.Contracts.csproj" />
+		<ProjectReference Include="..\LastMinuteTours.Services\LastMinuteTours.Services.csproj" />
+	</ItemGroup>
+
+</Project>

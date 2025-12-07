@@ -1,0 +1,32 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <Authors>Slavka</Authors>
+    <Product>$(AssemblyName)</Product>
+    <Description>DataGridView, выделив в отдельные проекты слой бизнес логики, работы с данными и UI.</Description>
+    <PackageTags>Duksin</PackageTags>
+    <PackageIcon>photo_2025-07-25_12-03-17.jpg</PackageIcon>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <Version>1.1.0</Version>
+  </PropertyGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\LastMinuteTours.Entities\LastMinuteTours.Entities.csproj" />
+		<ProjectReference Include="..\LastMinuteTours.Services.Contracts\LastMinuteTours.Services.Contracts.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+    <None Update="photo_2025-07-25_12-03-17.jpg">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+    <None Update="README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
+
+</Project>
