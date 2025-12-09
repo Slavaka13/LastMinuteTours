@@ -18,9 +18,8 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\LastMinuteTours.Entities\LastMinuteTours.Entities.csproj" />
-		<ProjectReference Include="..\LastMinuteTours.Services.Contracts\LastMinuteTours.Services.Contracts.csproj" />
-		<ProjectReference Include="..\LastMinuteTours.Services\LastMinuteTours.Services.csproj" />
+	  <ProjectReference Include="..\LastMinuteTours.Services\LastMinuteTours.Services.csproj" />
+	  <ProjectReference Include="..\LastMinuteToursManager\LastMinuteToursManager.csproj" />
 	</ItemGroup>
 
 </Project>

@@ -1,11 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using LastMinuteTours.Entities;
-using LastMinuteTours.Services;
-using LastMinuteTours.App.Infrastructure;
+﻿using LastMinuteTours.Entities;
+using LastMinuteToursManger.Contracts;
 
 namespace LastMinuteTours.App
 {
@@ -15,12 +9,12 @@ namespace LastMinuteTours.App
     public partial class MainForm : Form
     {
         // Сервис работы с турами
-        private readonly ITourService tourService;
+        private readonly ITourManager tourService;
 
         // Источник данных для DataGridView
         private readonly BindingSource bindingSource = new BindingSource();
 
-        public MainForm(ITourService tourService)
+        public MainForm(ITourManager tourService)
         {
             InitializeComponent();
 
@@ -57,9 +51,11 @@ namespace LastMinuteTours.App
                     "Ошибка",
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Error);
+        
             }
+            
         }
-
+       
         /// <summary>
         /// Общий метод: подгрузить туры и пересчитать статистику.
         /// </summary>

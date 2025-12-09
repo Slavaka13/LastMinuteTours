@@ -1,4 +1,4 @@
-﻿namespace LastMinuteTours.Services.Contracts
+﻿namespace LastMinuteToursManger.Contracts
 {
     /// <summary>
     /// Сводная статистика по турам.

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using LastMinuteTours.Entities;
-using LastMinuteTours.Services.Contracts;
+
 
 namespace LastMinuteTours.Services
 {
@@ -38,12 +38,5 @@ namespace LastMinuteTours.Services
         /// Если тур отсутствует — операция должна быть безопасной и не приводить к ошибкам.
         /// </summary>
         Task DeleteTourAsync(Guid id, CancellationToken token);
-
-        /// <summary>
-        /// Возвращает агрегированную статистику по всем турам.
-        /// Статистика включает общее количество туров, их суммарную стоимость,
-        /// количество туров с доплатами и общий объём доплат.
-        /// </summary>
-        Task<TourStatistics> GetStatisticsAsync(CancellationToken token);
     }
 }
