@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using LastMinuteTours.Entities;
-using LastMinuteTours.Services.Contracts;
+using Microsoft.Extensions.Logging;
 
 namespace LastMinuteTours.Services
 {
@@ -20,29 +21,36 @@ namespace LastMinuteTours.Services
         /// <inheritdoc />
         public Task<IList<TourModel>> GetAllToursAsync(CancellationToken token)
         {
+            
+
+            IList<TourModel> result;
             lock (syncRoot)
             {
-                return Task.FromResult<IList<TourModel>>(tours.ToList());
+                result = tours.ToList();
             }
+
+            return Task.FromResult(result);
         }
 
         /// <inheritdoc />
         public Task AddTourAsync(TourModel tour, CancellationToken token)
         {
+           
             if (tour == null)
                 throw new ArgumentNullException(nameof(tour));
-
+            
             lock (syncRoot)
             {
                 tours.Add(tour);
             }
-
+           
             return Task.CompletedTask;
         }
 
         /// <inheritdoc />
         public Task UpdateTourAsync(TourModel tour, CancellationToken token)
         {
+           
             if (tour == null)
                 throw new ArgumentNullException(nameof(tour));
 
@@ -60,41 +68,24 @@ namespace LastMinuteTours.Services
                     existing.AvailabilityWiFi = tour.AvailabilityWiFi;
                     existing.Surcharges = tour.Surcharges;
                 }
-            }
-
+            }        
+           
             return Task.CompletedTask;
         }
 
         /// <inheritdoc />
         public Task DeleteTourAsync(Guid id, CancellationToken token)
         {
+            
+
             lock (syncRoot)
             {
                 var existing = tours.FirstOrDefault(t => t.Id == id);
                 if (existing != null)
                     tours.Remove(existing);
-            }
-
+            }            
+           
             return Task.CompletedTask;
-        }
-
-        /// <inheritdoc />
-        public Task<TourStatistics> GetStatisticsAsync(CancellationToken token)
-        {
-            TourStatistics stats;
-
-            lock (syncRoot)
-            {
-                stats = new TourStatistics
-                {
-                    TotalTours = tours.Count,
-                    TotalCost = tours.Sum(t => t.CostPerVacationer * t.NumberVacationers + t.Surcharges),
-                    ToursWithSurcharges = tours.Count(t => t.Surcharges > 0),
-                    TotalSurcharges = tours.Sum(t => t.Surcharges)
-                };
-            }
-
-            return Task.FromResult(stats);
         }
     }
 }

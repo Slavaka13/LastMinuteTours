@@ -13,9 +13,13 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\LastMinuteTours.Entities\LastMinuteTours.Entities.csproj" />
-		<ProjectReference Include="..\LastMinuteTours.Services.Contracts\LastMinuteTours.Services.Contracts.csproj" />
-		<ProjectReference Include="..\LastMinuteTours.Services\LastMinuteTours.Services.csproj" />
+	  <PackageReference Include="Serilog.Extensions.Logging" Version="10.0.0" />
+	  <PackageReference Include="Serilog.Sinks.Seq" Version="9.0.0" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\LastMinuteTours.Services\LastMinuteTours.Services.csproj" />
+	  <ProjectReference Include="..\LastMinuteToursManager\LastMinuteToursManager.csproj" />
 	</ItemGroup>
 
 </Project>

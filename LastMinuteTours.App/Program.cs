@@ -1,6 +1,10 @@
 using System;
 using System.Windows.Forms;
+using LastMinuteTours.Entities;
+using Microsoft.Extensions.Logging;
+using Serilog;
 using LastMinuteTours.Services;
+using LastMinuteToursManager;
 
 namespace LastMinuteTours.App
 {
@@ -9,10 +13,26 @@ namespace LastMinuteTours.App
         [STAThread]
         static void Main()
         {
+
+
+            var serilogger = new LoggerConfiguration()
+                .MinimumLevel.Information()
+                .Enrich.FromLogContext()
+                .WriteTo.Seq("http://localhost:5341", apiKey: "KVq9gLWrMukpOXflrG4J")
+                .CreateLogger();
+
+            var loggerFactory = new LoggerFactory()
+                .AddSerilog(serilogger);
+
+
+
             ApplicationConfiguration.Initialize();
 
-            ITourService tourService = new InMemoryStorage();
-            Application.Run(new MainForm(tourService));
+            var tourService = new InMemoryStorage();
+            var tourManager = new TourManager(tourService, loggerFactory);
+            Application.Run(new MainForm(tourManager));
+            
+            
         }
     }
 }
