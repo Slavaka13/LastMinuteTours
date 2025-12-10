@@ -51,11 +51,11 @@ namespace LastMinuteTours.App
                     "Ошибка",
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Error);
-        
+
             }
-            
+
         }
-       
+
         /// <summary>
         /// Общий метод: подгрузить туры и пересчитать статистику.
         /// </summary>
@@ -212,6 +212,18 @@ namespace LastMinuteTours.App
 
             toolStrpLblTotalSurcharges.Text =
                 $"Общая сумма доплат: {stats.TotalSurcharges:N2} руб.";
+        }
+
+        private async void toolStripButton1_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                await LoadToursAndStatsAsync();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Ошибка при обновлении данных: " + ex.Message);
+            }
         }
     }
 }
