@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 using Serilog;
 using LastMinuteTours.Services;
 using LastMinuteToursManager;
+using DataBaseStorage;
 
 namespace LastMinuteTours.App
 {
@@ -28,7 +29,7 @@ namespace LastMinuteTours.App
 
             ApplicationConfiguration.Initialize();
 
-            var tourService = new InMemoryStorage();
+            var tourService = new DataBaseStorage.DataBaseStorage();
             var tourManager = new TourManager(tourService, loggerFactory);
             Application.Run(new MainForm(tourManager));
             

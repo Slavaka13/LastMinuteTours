@@ -17,6 +17,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LastMinuteToursManager", "L
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LastMinuteToursManger.Contracts", "LastMinuteToursManger.Contracts\LastMinuteToursManger.Contracts.csproj", "{11CA231B-8A93-4370-A6D5-F65DE88DC149}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataBaseStorage", "DataBaseStorage\DataBaseStorage.csproj", "{4C74FF67-EED3-4E71-9544-7D9802F6B8ED}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -51,6 +53,10 @@ Global
 		{11CA231B-8A93-4370-A6D5-F65DE88DC149}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{11CA231B-8A93-4370-A6D5-F65DE88DC149}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{11CA231B-8A93-4370-A6D5-F65DE88DC149}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4C74FF67-EED3-4E71-9544-7D9802F6B8ED}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4C74FF67-EED3-4E71-9544-7D9802F6B8ED}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4C74FF67-EED3-4E71-9544-7D9802F6B8ED}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4C74FF67-EED3-4E71-9544-7D9802F6B8ED}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
