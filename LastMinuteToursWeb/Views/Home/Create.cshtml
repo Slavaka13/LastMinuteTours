@@ -1,0 +1,52 @@
+﻿@model LastMinuteToursWeb.Models.TourEditViewModel
+@using LastMinuteTours.Entities
+
+@{
+    ViewData["Title"] = "Добавление тура";
+}
+
+<h2>Добавление тура</h2>
+
+<form method="post">
+    <div class="mb-2">
+        <label asp-for="Direction">Направление</label>
+        <select asp-for="Direction"
+                asp-items="Html.GetEnumSelectList<Direction>()"
+                class="form-select">
+            <option value="">-- выберите --</option>
+        </select>
+    </div>
+
+    <div class="mb-2">
+        <label asp-for="DepartureDate">Дата вылета</label>
+        <input asp-for="DepartureDate" class="form-control" />
+    </div>
+
+    <div class="mb-2">
+        <label asp-for="NumberNights">Количество ночей</label>
+        <input asp-for="NumberNights" class="form-control" />
+    </div>
+
+    <div class="mb-2">
+        <label asp-for="CostPerVacationer">Цена за отдыхающего</label>
+        <input asp-for="CostPerVacationer" class="form-control" />
+    </div>
+
+    <div class="mb-2">
+        <label asp-for="NumberVacationers">Количество отдыхающих</label>
+        <input asp-for="NumberVacationers" class="form-control" />
+    </div>
+
+    <div class="form-check mb-2">
+        <input asp-for="AvailabilityWiFi" class="form-check-input" />
+        <label asp-for="AvailabilityWiFi" class="form-check-label">Wi-Fi</label>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Surcharges">Доплаты</label>
+        <input asp-for="Surcharges" class="form-control" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Сохранить</button>
+    <a asp-action="Index" class="btn btn-secondary">Отмена</a>
+</form>
