@@ -1,9 +1,6 @@
-using DataBaseStorage;
 using LastMinuteTours.Services;
 using LastMinuteToursManager;
 using LastMinuteToursManger.Contracts;
-using Microsoft.Extensions.DependencyInjection;
-using Serilog;
 
 
 var builder = WebApplication.CreateBuilder(args);

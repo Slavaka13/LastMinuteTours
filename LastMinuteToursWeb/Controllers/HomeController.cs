@@ -1,5 +1,4 @@
-using LastMinuteTours.Entities;
-using LastMinuteToursManager;
+п»їusing LastMinuteTours.Entities;
 using LastMinuteToursManger.Contracts;
 using LastMinuteToursWeb.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -8,27 +7,29 @@ using System.Diagnostics;
 namespace LastMinuteToursWeb.Controllers
 {
     /// <summary>
-    /// Контроллер главной страницы веб-приложения.
-    /// Отвечает за отображение списка туров, агрегированной статистики,
-    /// а также за операции создания, редактирования и удаления туров.
+    /// РљРѕРЅС‚СЂРѕР»Р»РµСЂ РіР»Р°РІРЅРѕР№ СЃС‚СЂР°РЅРёС†С‹ РІРµР±-РїСЂРёР»РѕР¶РµРЅРёСЏ.
+    /// РћС‚РІРµС‡Р°РµС‚ Р·Р° РѕС‚РѕР±СЂР°Р¶РµРЅРёРµ СЃРїРёСЃРєР° С‚СѓСЂРѕРІ, Р°РіСЂРµРіРёСЂРѕРІР°РЅРЅРѕР№ СЃС‚Р°С‚РёСЃС‚РёРєРё,
+    /// Р° С‚Р°РєР¶Рµ Р·Р° РѕРїРµСЂР°С†РёРё СЃРѕР·РґР°РЅРёСЏ, СЂРµРґР°РєС‚РёСЂРѕРІР°РЅРёСЏ Рё СѓРґР°Р»РµРЅРёСЏ С‚СѓСЂРѕРІ.
     /// </summary>
     public class HomeController(ITourManager tourManager) : Controller
     {
+        private CancellationTokenSource CancellationTokenSource { get; } = new();
+
         /// <summary>
-        /// Менеджер туров, инкапсулирующий бизнес-логику работы с турами
-        /// и взаимодействие с хранилищем данных.
+        /// РњРµРЅРµРґР¶РµСЂ С‚СѓСЂРѕРІ, РёРЅРєР°РїСЃСѓР»РёСЂСѓСЋС‰РёР№ Р±РёР·РЅРµСЃ-Р»РѕРіРёРєСѓ СЂР°Р±РѕС‚С‹ СЃ С‚СѓСЂР°РјРё
+        /// Рё РІР·Р°РёРјРѕРґРµР№СЃС‚РІРёРµ СЃ С…СЂР°РЅРёР»РёС‰РµРј РґР°РЅРЅС‹С….
         /// </summary>
         private ITourManager TourManager { get; } = tourManager;
 
         /// <summary>
-        /// Отображает главную страницу со списком всех туров
-        /// и общей статистикой по ним.
+        /// РћС‚РѕР±СЂР°Р¶Р°РµС‚ РіР»Р°РІРЅСѓСЋ СЃС‚СЂР°РЅРёС†Сѓ СЃРѕ СЃРїРёСЃРєРѕРј РІСЃРµС… С‚СѓСЂРѕРІ
+        /// Рё РѕР±С‰РµР№ СЃС‚Р°С‚РёСЃС‚РёРєРѕР№ РїРѕ РЅРёРј.
         /// </summary>
-        /// <returns>Представление Index со списком туров и статистикой.</returns>
+        /// <returns>РџСЂРµРґСЃС‚Р°РІР»РµРЅРёРµ Index СЃРѕ СЃРїРёСЃРєРѕРј С‚СѓСЂРѕРІ Рё СЃС‚Р°С‚РёСЃС‚РёРєРѕР№.</returns>
         public async Task<IActionResult> Index()
         {
-            var tours = await TourManager.GetAllToursAsync();
-            var statistics = await TourManager.GetStatisticsAsync();
+            var tours = await TourManager.GetAllToursAsync(CancellationTokenSource.Token);
+            var statistics = await TourManager.GetStatisticsAsync(CancellationTokenSource.Token);
 
             var vm = new TourIndexViewModel
             {
@@ -40,9 +41,9 @@ namespace LastMinuteToursWeb.Controllers
         }
 
         /// <summary>
-        /// Отображает форму добавления нового тура.
+        /// РћС‚РѕР±СЂР°Р¶Р°РµС‚ С„РѕСЂРјСѓ РґРѕР±Р°РІР»РµРЅРёСЏ РЅРѕРІРѕРіРѕ С‚СѓСЂР°.
         /// </summary>
-        /// <returns>Представление Create с пустой моделью тура.</returns>
+        /// <returns>РџСЂРµРґСЃС‚Р°РІР»РµРЅРёРµ Create СЃ РїСѓСЃС‚РѕР№ РјРѕРґРµР»СЊСЋ С‚СѓСЂР°.</returns>
         [HttpGet]
         public IActionResult Create()
         {
@@ -50,12 +51,12 @@ namespace LastMinuteToursWeb.Controllers
         }
 
         /// <summary>
-        /// Обрабатывает отправку формы добавления нового тура.
+        /// РћР±СЂР°Р±Р°С‚С‹РІР°РµС‚ РѕС‚РїСЂР°РІРєСѓ С„РѕСЂРјС‹ РґРѕР±Р°РІР»РµРЅРёСЏ РЅРѕРІРѕРіРѕ С‚СѓСЂР°.
         /// </summary>
-        /// <param name="model">Модель данных тура, введённых пользователем.</param>
+        /// <param name="model">РњРѕРґРµР»СЊ РґР°РЅРЅС‹С… С‚СѓСЂР°, РІРІРµРґС‘РЅРЅС‹С… РїРѕР»СЊР·РѕРІР°С‚РµР»РµРј.</param>
         /// <returns>
-        /// Перенаправление на главную страницу при успешном добавлении
-        /// или повторное отображение формы при ошибках валидации.
+        /// РџРµСЂРµРЅР°РїСЂР°РІР»РµРЅРёРµ РЅР° РіР»Р°РІРЅСѓСЋ СЃС‚СЂР°РЅРёС†Сѓ РїСЂРё СѓСЃРїРµС€РЅРѕРј РґРѕР±Р°РІР»РµРЅРёРё
+        /// РёР»Рё РїРѕРІС‚РѕСЂРЅРѕРµ РѕС‚РѕР±СЂР°Р¶РµРЅРёРµ С„РѕСЂРјС‹ РїСЂРё РѕС€РёР±РєР°С… РІР°Р»РёРґР°С†РёРё.
         /// </returns>
         [HttpPost]
         public async Task<IActionResult> Create(TourEditViewModel model)
@@ -75,22 +76,22 @@ namespace LastMinuteToursWeb.Controllers
                 Surcharges = model.Surcharges
             };
 
-            await TourManager.AddTourAsync(tour);
+            await TourManager.AddTourAsync(tour, CancellationTokenSource.Token);
             return RedirectToAction(nameof(Index));
         }
 
         /// <summary>
-        /// Отображает форму редактирования существующего тура.
+        /// РћС‚РѕР±СЂР°Р¶Р°РµС‚ С„РѕСЂРјСѓ СЂРµРґР°РєС‚РёСЂРѕРІР°РЅРёСЏ СЃСѓС‰РµСЃС‚РІСѓСЋС‰РµРіРѕ С‚СѓСЂР°.
         /// </summary>
-        /// <param name="id">Идентификатор редактируемого тура.</param>
+        /// <param name="id">РРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ СЂРµРґР°РєС‚РёСЂСѓРµРјРѕРіРѕ С‚СѓСЂР°.</param>
         /// <returns>
-        /// Представление Edit с данными тура
-        /// или результат NotFound, если тур не найден.
+        /// РџСЂРµРґСЃС‚Р°РІР»РµРЅРёРµ Edit СЃ РґР°РЅРЅС‹РјРё С‚СѓСЂР°
+        /// РёР»Рё СЂРµР·СѓР»СЊС‚Р°С‚ NotFound, РµСЃР»Рё С‚СѓСЂ РЅРµ РЅР°Р№РґРµРЅ.
         /// </returns>
         [HttpGet]
         public async Task<IActionResult> Edit(Guid id)
         {
-            var tours = await TourManager.GetAllToursAsync();
+            var tours = await TourManager.GetAllToursAsync(CancellationTokenSource.Token);
             var tour = tours.FirstOrDefault(t => t.Id == id);
 
             if (tour == null)
@@ -112,12 +113,12 @@ namespace LastMinuteToursWeb.Controllers
         }
 
         /// <summary>
-        /// Обрабатывает отправку формы редактирования тура.
+        /// РћР±СЂР°Р±Р°С‚С‹РІР°РµС‚ РѕС‚РїСЂР°РІРєСѓ С„РѕСЂРјС‹ СЂРµРґР°РєС‚РёСЂРѕРІР°РЅРёСЏ С‚СѓСЂР°.
         /// </summary>
-        /// <param name="model">Обновлённые данные тура.</param>
+        /// <param name="model">РћР±РЅРѕРІР»С‘РЅРЅС‹Рµ РґР°РЅРЅС‹Рµ С‚СѓСЂР°.</param>
         /// <returns>
-        /// Перенаправление на главную страницу при успешном сохранении
-        /// или повторное отображение формы при ошибках валидации.
+        /// РџРµСЂРµРЅР°РїСЂР°РІР»РµРЅРёРµ РЅР° РіР»Р°РІРЅСѓСЋ СЃС‚СЂР°РЅРёС†Сѓ РїСЂРё СѓСЃРїРµС€РЅРѕРј СЃРѕС…СЂР°РЅРµРЅРёРё
+        /// РёР»Рё РїРѕРІС‚РѕСЂРЅРѕРµ РѕС‚РѕР±СЂР°Р¶РµРЅРёРµ С„РѕСЂРјС‹ РїСЂРё РѕС€РёР±РєР°С… РІР°Р»РёРґР°С†РёРё.
         /// </returns>
         [HttpPost]
         public async Task<IActionResult> Edit(TourEditViewModel model)
@@ -125,7 +126,7 @@ namespace LastMinuteToursWeb.Controllers
             if (!ModelState.IsValid)
                 return View(model);
 
-            var tours = await TourManager.GetAllToursAsync();
+            var tours = await TourManager.GetAllToursAsync(CancellationTokenSource.Token);
             var tour = tours.FirstOrDefault(t => t.Id == model.Id);
 
             if (tour == null)
@@ -139,21 +140,21 @@ namespace LastMinuteToursWeb.Controllers
             tour.AvailabilityWiFi = model.AvailabilityWiFi;
             tour.Surcharges = model.Surcharges;
 
-            await TourManager.UpdateTourAsync(tour);
+            await TourManager.UpdateTourAsync(tour, CancellationTokenSource.Token);
             return RedirectToAction(nameof(Index));
         }
 
         /// <summary>
-        /// Отображает страницу подтверждения удаления тура.
+        /// РћС‚РѕР±СЂР°Р¶Р°РµС‚ СЃС‚СЂР°РЅРёС†Сѓ РїРѕРґС‚РІРµСЂР¶РґРµРЅРёСЏ СѓРґР°Р»РµРЅРёСЏ С‚СѓСЂР°.
         /// </summary>
-        /// <param name="id">Идентификатор удаляемого тура.</param>
+        /// <param name="id">РРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ СѓРґР°Р»СЏРµРјРѕРіРѕ С‚СѓСЂР°.</param>
         /// <returns>
-        /// Представление подтверждения удаления
-        /// или результат NotFound, если тур не найден.
+        /// РџСЂРµРґСЃС‚Р°РІР»РµРЅРёРµ РїРѕРґС‚РІРµСЂР¶РґРµРЅРёСЏ СѓРґР°Р»РµРЅРёСЏ
+        /// РёР»Рё СЂРµР·СѓР»СЊС‚Р°С‚ NotFound, РµСЃР»Рё С‚СѓСЂ РЅРµ РЅР°Р№РґРµРЅ.
         /// </returns>
         public async Task<IActionResult> Delete(Guid id)
         {
-            var tours = await TourManager.GetAllToursAsync();
+            var tours = await TourManager.GetAllToursAsync(CancellationTokenSource.Token);
             var tour = tours.FirstOrDefault(t => t.Id == id);
 
             if (tour == null)
@@ -163,20 +164,20 @@ namespace LastMinuteToursWeb.Controllers
         }
 
         /// <summary>
-        /// Выполняет удаление тура после подтверждения пользователем.
+        /// Р’С‹РїРѕР»РЅСЏРµС‚ СѓРґР°Р»РµРЅРёРµ С‚СѓСЂР° РїРѕСЃР»Рµ РїРѕРґС‚РІРµСЂР¶РґРµРЅРёСЏ РїРѕР»СЊР·РѕРІР°С‚РµР»РµРј.
         /// </summary>
-        /// <param name="id">Идентификатор удаляемого тура.</param>
-        /// <returns>Перенаправление на главную страницу.</returns>
+        /// <param name="id">РРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ СѓРґР°Р»СЏРµРјРѕРіРѕ С‚СѓСЂР°.</param>
+        /// <returns>РџРµСЂРµРЅР°РїСЂР°РІР»РµРЅРёРµ РЅР° РіР»Р°РІРЅСѓСЋ СЃС‚СЂР°РЅРёС†Сѓ.</returns>
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(Guid id)
         {
-            await TourManager.DeleteTourAsync(id);
+            await TourManager.DeleteTourAsync(id, CancellationTokenSource.Token);
             return RedirectToAction(nameof(Index));
         }
 
         /// <summary>
-        /// Отображает страницу политики конфиденциальности.
+        /// РћС‚РѕР±СЂР°Р¶Р°РµС‚ СЃС‚СЂР°РЅРёС†Сѓ РїРѕР»РёС‚РёРєРё РєРѕРЅС„РёРґРµРЅС†РёР°Р»СЊРЅРѕСЃС‚Рё.
         /// </summary>
         public IActionResult Privacy()
         {
@@ -184,7 +185,7 @@ namespace LastMinuteToursWeb.Controllers
         }
 
         /// <summary>
-        /// Отображает страницу ошибки приложения.
+        /// РћС‚РѕР±СЂР°Р¶Р°РµС‚ СЃС‚СЂР°РЅРёС†Сѓ РѕС€РёР±РєРё РїСЂРёР»РѕР¶РµРЅРёСЏ.
         /// </summary>
         public IActionResult Error()
         {
