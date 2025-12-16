@@ -3,6 +3,7 @@ using LastMinuteToursManger.Contracts;
 using LastMinuteToursWeb.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
+using System.Threading;
 
 namespace LastMinuteToursWeb.Controllers
 {
@@ -13,7 +14,7 @@ namespace LastMinuteToursWeb.Controllers
     /// </summary>
     public class HomeController(ITourManager tourManager) : Controller
     {
-        private CancellationTokenSource CancellationTokenSource { get; } = new();
+        
 
         /// <summary>
         /// Менеджер туров, инкапсулирующий бизнес-логику работы с турами
@@ -26,10 +27,10 @@ namespace LastMinuteToursWeb.Controllers
         /// и общей статистикой по ним.
         /// </summary>
         /// <returns>Представление Index со списком туров и статистикой.</returns>
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(CancellationToken cancellationToken)
         {
-            var tours = await TourManager.GetAllToursAsync(CancellationTokenSource.Token);
-            var statistics = await TourManager.GetStatisticsAsync(CancellationTokenSource.Token);
+            var tours = await TourManager.GetAllToursAsync(cancellationToken);
+            var statistics = await TourManager.GetStatisticsAsync(cancellationToken);
 
             var vm = new TourIndexViewModel
             {
@@ -59,7 +60,7 @@ namespace LastMinuteToursWeb.Controllers
         /// или повторное отображение формы при ошибках валидации.
         /// </returns>
         [HttpPost]
-        public async Task<IActionResult> Create(TourEditViewModel model)
+        public async Task<IActionResult> Create(TourEditViewModel model, CancellationToken cancellationToken)
         {
             if (!ModelState.IsValid)
                 return View(model);
@@ -76,7 +77,7 @@ namespace LastMinuteToursWeb.Controllers
                 Surcharges = model.Surcharges
             };
 
-            await TourManager.AddTourAsync(tour, CancellationTokenSource.Token);
+            await TourManager.AddTourAsync(tour, cancellationToken);
             return RedirectToAction(nameof(Index));
         }
 
@@ -89,9 +90,9 @@ namespace LastMinuteToursWeb.Controllers
         /// или результат NotFound, если тур не найден.
         /// </returns>
         [HttpGet]
-        public async Task<IActionResult> Edit(Guid id)
+        public async Task<IActionResult> Edit(Guid id, CancellationToken cancellationToken)
         {
-            var tours = await TourManager.GetAllToursAsync(CancellationTokenSource.Token);
+            var tours = await TourManager.GetAllToursAsync(cancellationToken);
             var tour = tours.FirstOrDefault(t => t.Id == id);
 
             if (tour == null)
@@ -121,12 +122,12 @@ namespace LastMinuteToursWeb.Controllers
         /// или повторное отображение формы при ошибках валидации.
         /// </returns>
         [HttpPost]
-        public async Task<IActionResult> Edit(TourEditViewModel model)
+        public async Task<IActionResult> Edit(TourEditViewModel model, CancellationToken cancellationToken)
         {
             if (!ModelState.IsValid)
                 return View(model);
 
-            var tours = await TourManager.GetAllToursAsync(CancellationTokenSource.Token);
+            var tours = await TourManager.GetAllToursAsync(cancellationToken);
             var tour = tours.FirstOrDefault(t => t.Id == model.Id);
 
             if (tour == null)
@@ -140,7 +141,7 @@ namespace LastMinuteToursWeb.Controllers
             tour.AvailabilityWiFi = model.AvailabilityWiFi;
             tour.Surcharges = model.Surcharges;
 
-            await TourManager.UpdateTourAsync(tour, CancellationTokenSource.Token);
+            await TourManager.UpdateTourAsync(tour, cancellationToken);
             return RedirectToAction(nameof(Index));
         }
 
@@ -152,9 +153,9 @@ namespace LastMinuteToursWeb.Controllers
         /// Представление подтверждения удаления
         /// или результат NotFound, если тур не найден.
         /// </returns>
-        public async Task<IActionResult> Delete(Guid id)
+        public async Task<IActionResult> Delete(Guid id, CancellationToken cancellationToken)
         {
-            var tours = await TourManager.GetAllToursAsync(CancellationTokenSource.Token);
+            var tours = await TourManager.GetAllToursAsync(cancellationToken);
             var tour = tours.FirstOrDefault(t => t.Id == id);
 
             if (tour == null)
@@ -170,9 +171,9 @@ namespace LastMinuteToursWeb.Controllers
         /// <returns>Перенаправление на главную страницу.</returns>
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(Guid id)
+        public async Task<IActionResult> DeleteConfirmed(Guid id, CancellationToken cancellationToken)
         {
-            await TourManager.DeleteTourAsync(id, CancellationTokenSource.Token);
+            await TourManager.DeleteTourAsync(id, cancellationToken);
             return RedirectToAction(nameof(Index));
         }
 
